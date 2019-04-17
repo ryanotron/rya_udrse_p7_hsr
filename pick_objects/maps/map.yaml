@@ -1,0 +1,7 @@
+#image: map_salient.pgm
+image: map_geo2_alt.pgm
+resolution: 0.01
+origin: [-15.0, -15.0, 0.0]
+occupied_thresh: 0.80
+free_thresh: 0.10
+negate: 0 
