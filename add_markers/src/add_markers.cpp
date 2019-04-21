@@ -1,3 +1,4 @@
+#include <random>
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 #include <nav_msgs/Odometry.h>
@@ -12,16 +13,19 @@ typedef geometry_msgs::Point Pt;
 
 ros::Publisher marker_pub;
 
+// global utilities
 vector<VisMarker> markers;
 double theta_carry = 1.507;
-double dtheta = 0.754;
+double dtheta = 1.047;
+default_random_engine randgen;
+uniform_real_distribution<double> randist(-0.2, 0.2);
 
-bool object_picked;
-bool object_dropped;
-double pickup_x;
-double pickup_y;
-double dropoff_x;
-double dropoff_y;
+//bool object_picked;
+//bool object_dropped;
+//double pickup_x;
+//double pickup_y;
+//double dropoff_x;
+//double dropoff_y;
 
 VisMarker marker;
 
@@ -53,7 +57,7 @@ void add_pickup_cb(const Pt point) {
 // draw markers at rate independent of pose message
 void draw_markers() {
     for (int i = 0; i < markers.size(); i++) {
-        ROS_INFO("marker %d frame %s", i, markers[i].header.frame_id.c_str());
+//        ROS_INFO("marker %d frame %s", i, markers[i].header.frame_id.c_str());
         markers[i].header.stamp = ros::Time::now();
         marker_pub.publish(markers[i]);
     }
@@ -86,20 +90,22 @@ void odom_cb(const geometry_msgs::PoseWithCovarianceStamped odom) {
             if (dt > 0.5*t_wait) {
                 // drop all picked up objects
                 double drop_x, drop_y;
-                drop_x = odom.pose.pose.position.x - 0.25; // add offset so the marker isn't occluded by the robot model in rviz
-                drop_y = odom.pose.pose.position.y;
+//                drop_x = odom.pose.pose.position.x - 0.25; // add offset so the marker isn't occluded by the robot model in rviz
+//                drop_y = odom.pose.pose.position.y;
+                drop_x = dropoff[0];
+                drop_y = dropoff[1];
 
                 int i = 0;
                 while (i < markers.size()) {
                     if (markers[i].header.frame_id == "base_footprint") {
-                        ROS_INFO("object %d dropped, change frame to map", i);
                         markers[i].header.frame_id = "map";
                         markers[i].header.stamp = ros::Time::now();
-                        markers[i].pose.position.x = drop_x;
-                        markers[i].pose.position.y = drop_y;
+                        markers[i].pose.position.x = drop_x + randist(randgen);
+                        markers[i].pose.position.y = drop_y + randist(randgen);
                         markers[i].color.a = 1.0f;
                         drop_x += 0.01;
                         ++i;
+                        ROS_INFO("object %d dropped at (%5.2f, %5.2f), change frame to map", i, drop_x, drop_y);
                     }
                 }
                 pickup_timer_trigger = false;
@@ -133,8 +139,8 @@ void odom_cb(const geometry_msgs::PoseWithCovarianceStamped odom) {
                     ROS_INFO("object %d picked up, change frame to robot", i);
                     picked_up_status[i] = true;
                     markers[i].header.frame_id = "base_footprint";
-                    markers[i].pose.position.x = 0.25*cos(theta_carry);
-                    markers[i].pose.position.y = 0.25*sin(theta_carry);
+                    markers[i].pose.position.x = 0.3*cos(theta_carry);
+                    markers[i].pose.position.y = 0.3*sin(theta_carry);
                     theta_carry += dtheta;
                     markers[i].header.stamp = ros::Time::now();
                     markers[i].color.a = 1.0f;
@@ -159,7 +165,7 @@ int main(int argc, char** argv) {
     for (int i = 0; i + 2 <= pickups_flat.size(); i+=2) {
         vector<double> pickup {pickups_flat[i], pickups_flat[i+1]};
         pickups.push_back(pickup);
-        ROS_INFO("%5.2f, %5.2f", pickup[0], pickup[1]);
+        ROS_INFO("%d: %5.2f, %5.2f", i, pickup[0], pickup[1]);
     }
 
     // pubsub setup
