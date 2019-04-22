@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<launch>
+    <!-- global ros param -->
+    <rosparam>
+        use_sim_time: true
+    </rosparam>
+    
+    <include file="$(find my_robot)/launch/world.launch" />
+    <include file="$(find my_robot)/launch/amcl.launch" />
+    <include file="$(find my_robot)/launch/rviz.launch" />
+</launch>

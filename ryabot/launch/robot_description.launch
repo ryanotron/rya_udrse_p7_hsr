@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<launch>
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+        <param name="use_gui" value="false" />
+        <param name="rate" value="50" />
+    </node>
+    
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen" />
+</launch>
