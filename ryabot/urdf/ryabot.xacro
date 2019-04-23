@@ -181,6 +181,7 @@
         </visual>
     </link>
     
+    <!--
     <link name="hokuyo2">
         <inertial>
             <mass value="0.10" />
@@ -205,6 +206,7 @@
             </geometry>
         </visual>
     </link>
+    -->
     
     <!-- define robot joints -->
     <joint name="robot_footprint_joint" type="fixed">
@@ -244,11 +246,12 @@
         <child link="hokuyo" />
         <axis xyz="0 1 0" rpy="0 0 0" />
     </joint>
-    
+    <!--
     <joint name="hokuyo2_joint" type="fixed">
         <origin xyz="-0.15 0.0 0.12" rpy="0 0 3.1415" />
         <parent link="chassis" />
         <child link="hokuyo2" />
         <axis xyz="0 1 0" rpy="0 0 0" />
     </joint>
+    -->
 </robot>    

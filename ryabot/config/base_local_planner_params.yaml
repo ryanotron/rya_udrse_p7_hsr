@@ -10,4 +10,4 @@ TrajectoryPlannerROS:
   ##acc_lim_y: 10.0
   
   holonomic_robot: false
-  controller_frequency: 50.0
+  controller_frequency: 10.0

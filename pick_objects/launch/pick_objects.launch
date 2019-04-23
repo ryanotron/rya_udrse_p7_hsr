@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <launch>
-    <rosparam command="load" file="$(find pick_objects)/param/coordinates.yaml" />
+    <rosparam command="load" file="$(find pick_objects)/param/coordinates_ground_truth.yaml" />
     <node pkg="pick_objects" type="pick_objects" name="pick_objects" output="screen" clear_params="true" />
     <node pkg="add_markers" type="add_markers" name="add_markers" output="screen" clear_params="true" />
 </launch>

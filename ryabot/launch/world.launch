@@ -7,7 +7,7 @@
     <arg name="z" default="0.000" />
     <arg name="roll" default="0.080" />
     <arg name="pitch" default="0.000" />
-    <arg name="yaw" default="0.000" />
+    <arg name="yaw" default="-1.57075" />
     
     <!-- include robot joint/state publisher launch file -->
     <include file="$(find ryabot)/launch/robot_description.launch" />
