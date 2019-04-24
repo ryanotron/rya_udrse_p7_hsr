@@ -1,9 +1,10 @@
+<?xml version="1.0" ?>
 <launch>
   <arg name="scan_topic"  default="scan" />
   <arg name="base_frame"  default="robot_footprint"/>
   <arg name="odom_frame"  default="odom"/>
 
-  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen" clear_params="true">
     <param name="base_frame" value="$(arg base_frame)"/>
     <param name="odom_frame" value="$(arg odom_frame)"/>
     <param name="map_update_interval" value="0.5"/>
