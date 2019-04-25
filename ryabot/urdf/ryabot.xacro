@@ -5,18 +5,18 @@
     <xacro:include filename="$(find ryabot)/urdf/ryabot.gazebo" />
     
     <!-- define robot links -->
-    <link name="robot_footprint"></link>
+    <link name="base_footprint"></link>
     
     <link name="chassis">
         <pose>0 0 0.05 0 0 0</pose>
         
         <inertial>
-            <mass value="7.50" />
+            <mass value="5.00" />
             <origin xyz="0 0 0" rpy="0 0 0" />
             <inertia
-                ixx="0.2" ixy="0" ixz="0"
-                iyy="0.2" iyz="0"
-                izz="0.2"
+                ixx="0.1" ixy="0" ixz="0"
+                iyy="0.1" iyz="0"
+                izz="0.01"
             />
         </inertial>
         
@@ -211,7 +211,7 @@
     <!-- define robot joints -->
     <joint name="robot_footprint_joint" type="fixed">
         <origin xyz="0 0 0" rpy="0 0 0" />
-        <parent link="robot_footprint" />
+        <parent link="base_footprint" />
         <child link="chassis" />
     </joint>
     
