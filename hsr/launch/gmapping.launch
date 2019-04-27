@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="3d_sensor" default="$(env TURTLEBOT_3D_SENSOR)"/>  <!-- r200, kinect, asus_xtion_pro -->
+  <arg name="custom_gmapping_launch_file" default="$(find hsr)/launch/includes/asus_xtion_pro_gmapping.launch.xml" />
+  <include file="$(arg custom_gmapping_launch_file)"/>
+  <include file="$(find hsr)/launch/includes/move_base.launch.xml" />
+</launch>

@@ -41,6 +41,7 @@ ros::Time pickup_time;
 
 // bookkeeping
 vector<bool> picked_up_status;
+Pt last_position;
 
 void add_pickup_cb(const Pt point) {
     VisMarker new_marker;
@@ -72,6 +73,8 @@ double calc_d(Pt pose, vector<double> ref) {
 }
 
 void odom_cb(const geometry_msgs::PoseWithCovarianceStamped odom) {
+    last_position = odom.pose.pose.position;
+
     // short circuit if there is no marker left
     // that is, when we have returned to dropoff
     if (markers.size() < 1) {
@@ -90,8 +93,6 @@ void odom_cb(const geometry_msgs::PoseWithCovarianceStamped odom) {
             if (dt > 0.5*t_wait) {
                 // drop all picked up objects
                 double drop_x, drop_y;
-//                drop_x = odom.pose.pose.position.x - 0.25; // add offset so the marker isn't occluded by the robot model in rviz
-//                drop_y = odom.pose.pose.position.y;
                 drop_x = dropoff[0];
                 drop_y = dropoff[1];
 
@@ -151,6 +152,63 @@ void odom_cb(const geometry_msgs::PoseWithCovarianceStamped odom) {
     }
 }
 
+// independent check if pickup/dropoff is done
+// odom_cb depends on amcl messages. When the robot stands still, this doesn't get published
+void check_pickup() {
+    // has the timer run for long enough?
+    double dt = (ros::Time::now() - pickup_time).toSec();
+    if (dt < 0.5*t_wait) {
+        return;
+    }
+
+    // are we at dropoff?
+    double d = calc_d(last_position, dropoff);
+    if (d < th) {
+        int i = 0;
+        double drop_x = dropoff[0];
+        double drop_y = dropoff[1];
+        while (i < markers.size()) {
+            if (markers[i].header.frame_id == "base_footprint") {
+                markers[i].header.frame_id = "map";
+                markers[i].header.stamp = ros::Time::now();
+                markers[i].pose.position.x = drop_x + randist(randgen);
+                markers[i].pose.position.y = drop_y + randist(randgen);
+                markers[i].color.a = 1.0f;
+                ++i;
+                ROS_INFO("object %d dropped at (%5.2f, %5.2f), change frame to map", i, drop_x, drop_y);
+            }
+        }
+        pickup_timer_trigger = false;
+        return;
+    }
+
+    // are we at pickup?
+    for (int i = 0; i < markers.size(); i++) {
+        // skip things that have been picked up
+        // both currently being carried and dropped off
+        if (markers[i].header.frame_id == "base_footprint") {
+            continue;
+        }
+
+        if (picked_up_status[i]) {
+            continue;
+        }
+
+        d = calc_d(last_position, pickups[i]);
+        if (d < th) {
+            ROS_INFO("object %d picked up, change frame to robot", i);
+            picked_up_status[i] = true;
+            markers[i].header.frame_id = "base_footprint";
+            markers[i].pose.position.x = 0.3*cos(theta_carry);
+            markers[i].pose.position.y = 0.3*sin(theta_carry);
+            theta_carry += dtheta;
+            markers[i].header.stamp = ros::Time::now();
+            markers[i].color.a = 1.0f;
+            pickup_timer_trigger = false;
+        }
+    }
+}
+
 int main(int argc, char** argv) {
     // node setup
     ros::init(argc, argv, "add_markers");
@@ -167,6 +225,9 @@ int main(int argc, char** argv) {
         pickups.push_back(pickup);
         ROS_INFO("%d: %5.2f, %5.2f", i, pickup[0], pickup[1]);
     }
+
+    th = 0.25;
+    ros::param::get("distance_threshhold", th);
 
     // pubsub setup
     marker_pub = nh.advertise<visualization_msgs::Marker>("vis_marker", 1);
@@ -204,8 +265,6 @@ int main(int argc, char** argv) {
         markers.push_back(marker_i);
     }
 
-    th = 0.1;
-
     while (marker_pub.getNumSubscribers() < 1) {
         if (!ros::ok()) {
             return 0;
@@ -219,6 +278,9 @@ int main(int argc, char** argv) {
     // keep node alive
     while (ros::ok()) {
         ros::spinOnce();
+        if (pickup_timer_trigger) {
+            check_pickup();
+        }
         draw_markers();
     }
 
