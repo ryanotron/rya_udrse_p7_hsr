@@ -32,6 +32,9 @@ Steps:
 
 An example map is provided in hsr/map/map_xtion.yaml
 
+Below shows the mapping in progress:
+![mapping with xtion](./figures/00_mapping_xtion.gif)
+
 #### Lidar
 Steps:
 1. launch world with `roslaunch ryabot world.launch`
