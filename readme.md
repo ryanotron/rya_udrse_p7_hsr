@@ -4,6 +4,8 @@ Does these things:
 - pick things up from pickup locations in the area
 - drop them off in a dropoff location
 
+![pickup](./figures/02_pickup.gif)
+
 ## Requirements
 - ROS Kinetic, with packages
     - turtlebot_gazebo
@@ -33,6 +35,7 @@ Steps:
 An example map is provided in hsr/map/map_xtion.yaml
 
 Below shows the mapping in progress:
+
 ![mapping with xtion](./figures/00_mapping_xtion.gif)
 
 #### Lidar
@@ -46,6 +49,10 @@ Steps:
 1. move on to Pickup section
 
 An example map is provided in hsr/map/map_urg.yaml
+
+Below shows the mapping (with lidar) in progress:
+
+![mapping with lidar](./figures/01_mapping_lidar.gif)
 
 ### Pickup
 The pickup task is only tested with Turtlebot/Xtion, so only instruction for that is provided here. 
@@ -62,6 +69,10 @@ Steps:
 1. launch rviz with `roslaunch hsr view_navigation.launch`
 1. launch object picker and visualiser with `roslaunch pick_objects pick_objects.launch`. Make sure your pickup/dropoff params are set. Working example in pick_objects/param/coordinates.yaml
 1. watch the robot does its work
+
+Here is the tail end of the pickup process in action:
+
+![pickup](./figures/02_pickup.gif)
 
 ## Batteries Included
 
